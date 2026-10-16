@@ -126,22 +126,23 @@ $('#contact-form').addEventListener('submit', async (event) => {
   }
 });
 
-// The approved route is rebuilt from the section geometry. Deliberate exits
-// and re-entries are exactly those visible in the approved reference.
+// The route follows the current section geometry, including expanded desktop panels.
 let routeFrame;
 function scheduleRoute() { cancelAnimationFrame(routeFrame); routeFrame = requestAnimationFrame(drawRoute); }
 function matchType() {
   const width = $('.sheet').getBoundingClientRect().width;
   const scale = width / 941;
   $$('[data-width]').forEach((span) => {
-    const target = Number(span.dataset.width) * (width >= 768 ? scale : (span.closest('h1') ? (width < 360 ? .91 : 1) : 1));
+    const section = span.closest('.section');
+    const titleScale = width >= 768 && section ? Number(getComputedStyle(section).getPropertyValue('--title-scale')) || 1 : 1;
+    const target = Number(span.dataset.width) * titleScale * (width >= 768 ? scale : (span.closest('h1') ? (width < 360 ? .91 : 1) : 1));
     span.style.transform = `scaleX(${target / span.offsetWidth})`;
   });
 }
 function drawRoute() {
   const sheet = $('.sheet'), base = sheet.getBoundingClientRect(), width = base.width, scale = width / 941;
   const box = (selector) => {
-    const r = $(selector).getBoundingClientRect();
+    const r = (typeof selector === 'string' ? $(selector) : selector).getBoundingClientRect();
     return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height, right: r.right - base.left, bottom: r.bottom - base.top };
   };
   const svg = $('.route'); svg.setAttribute('viewBox', `0 0 ${width} ${base.height}`);
@@ -153,12 +154,20 @@ function drawRoute() {
     const y = (section, v) => (section.y + v * scale).toFixed(2);
     const cy = cta.y + cta.h / 2;
     path = `M ${cta.right} ${cy} H ${x(435)} Q ${x(460)} ${cy} ${x(477)} ${cy - 24 * scale} L ${x(704)} ${y(h,78)} V 0`;
-    path += ` M ${x(314)} ${y(s,31)} H ${x(407)} Q ${x(448)} ${y(s,31)} ${x(448)} ${y(s,72)} V ${y(s,179)} Q ${x(448)} ${y(s,224)} ${x(493)} ${y(s,224)} H ${x(646)} Q ${x(690)} ${y(s,224)} ${x(690)} ${y(s,180)} V ${y(s,74)} Q ${x(690)} ${y(s,31)} ${x(733)} ${y(s,31)} H ${x(853)} Q ${x(894)} ${y(s,31)} ${x(894)} ${y(s,72)} V ${y(p,30)} Q ${x(894)} ${y(p,73)} ${x(851)} ${y(p,73)} H ${x(357)}`;
-    path += ` M 0 ${y(b,186)} H ${x(262)} Q ${x(297)} ${y(b,186)} ${x(297)} ${y(b,151)} V ${y(b,65)} Q ${x(297)} ${y(b,26)} ${x(336)} ${y(b,26)} H ${x(825)} Q ${x(864)} ${y(b,26)} ${x(864)} ${y(b,65)} V ${y(b,99)}`;
-    const faqBottom = f.h / scale - 25;
-    path += ` M 0 ${y(f,faqBottom)} H ${x(383)} Q ${x(422)} ${y(f,faqBottom)} ${x(422)} ${y(f,faqBottom-39)} V ${y(f,126)} Q ${x(422)} ${y(f,86)} ${x(382)} ${y(f,86)} H ${x(315)}`;
-    contactPath = `M ${x(707)} ${y(c,140)} L ${x(796)} ${y(c,135)} Q ${x(800)} ${y(c,140)} ${x(793)} ${y(c,157)} L ${x(778)} ${y(c,188)} Q ${x(770)} ${y(c,200)} ${x(790)} ${y(c,201)} L ${x(871)} ${y(c,208)} Q ${x(896)} ${y(c,212)} ${x(918)} ${c.bottom}`;
-    nodes = [[314,y(s,31)],[523,y(s,31)],[741,y(s,31)],[357,y(p,73)],[460,y(p,73)],[571,y(p,73)],[690,y(p,73)],[826,y(p,73)],[335,y(b,26)],[517,y(b,26)],[718,y(b,26)]].map(([cx,cy]) => ({ x: cx * scale, y:Number(cy) }));
+    const anchors = (selector) => $$(selector).map((el) => { const r = box(el); return { x:r.x, y:r.y }; });
+    const services = anchors('.service .route-anchor'), steps = anchors('.steps .route-anchor'), benefits = anchors('.benefit .route-anchor');
+    const cards = $$('.service').map(box);
+    const gap1 = (cards[0].right + cards[1].x) / 2, gap2 = (cards[1].right + cards[2].x) / 2;
+    const low = box('.service img').bottom - 14 * scale;
+    const right = width - 35 * scale, radius = 40 * scale;
+    const sy = services[0].y, py = steps[0].y;
+    path += ` M ${services[0].x} ${sy} H ${gap1-radius} Q ${gap1} ${sy} ${gap1} ${sy+radius} V ${low-radius} Q ${gap1} ${low} ${gap1+radius} ${low} H ${gap2-radius} Q ${gap2} ${low} ${gap2} ${low-radius} V ${sy+radius} Q ${gap2} ${sy} ${gap2+radius} ${sy} H ${right-radius} Q ${right} ${sy} ${right} ${sy+radius} V ${py-radius} Q ${right} ${py} ${right-radius} ${py} H ${steps[0].x}`;
+    const left = box('.benefit').x - 30 * scale, by = benefits[0].y, bottom = b.bottom - 65 * scale;
+    path += ` M 0 ${bottom} H ${left-radius} Q ${left} ${bottom} ${left} ${bottom-radius} V ${by+radius} Q ${left} ${by} ${left+radius} ${by} H ${right-radius} Q ${right} ${by} ${right} ${by+radius} V ${b.y+230*scale}`;
+    const loopBottom = f.bottom - 42 * scale, loopTop = f.y + f.h * .64;
+    path += ` M 0 ${loopBottom} H ${x(382)} Q ${x(422)} ${loopBottom} ${x(422)} ${loopBottom-radius} V ${loopTop+radius} Q ${x(422)} ${loopTop} ${x(382)} ${loopTop} H ${x(315)}`;
+    contactPath = `M ${x(707)} ${c.y+c.h*.62} L ${x(796)} ${c.y+c.h*.60} Q ${x(800)} ${c.y+c.h*.62} ${x(793)} ${c.y+c.h*.70} L ${x(778)} ${c.y+c.h*.87} Q ${x(770)} ${c.y+c.h*.91} ${x(790)} ${c.y+c.h*.92} L ${x(871)} ${c.y+c.h*.96} Q ${x(896)} ${c.y+c.h*.98} ${x(918)} ${c.bottom}`;
+    nodes = [...services,...steps,...benefits];
   } else {
     const gutter = width < 360 ? 12 : 15;
     const bend = width - 16;

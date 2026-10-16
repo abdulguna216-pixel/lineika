@@ -20,12 +20,14 @@ for (const width of [941, 1440, 390, 320, 375, 768, 1024]) {
   });
   const state = await page.evaluate(() => ({
     width: innerWidth, documentWidth: document.documentElement.scrollWidth, height: document.documentElement.scrollHeight,
+    heroHeight: Math.round(document.querySelector('.hero-area').getBoundingClientRect().height),
     images: [...document.images].every((image) => image.complete && image.naturalWidth > 0),
     route: !!document.getElementById('route-path').getAttribute('d'),
     sections: [...document.querySelectorAll('.section')].map((el) => ({ id: el.id, height: Math.round(el.getBoundingClientRect().height) }))
   }));
   assert.ok(state.documentWidth <= width, `Overflow at ${width}: ${state.documentWidth}`);
   assert.ok(state.images && state.route);
+  if (width >= 768) state.sections.forEach((section) => assert.ok(Math.abs(section.height - state.heroHeight) <= 1, `${section.id} must match Hero at ${width}px`));
   if ([941, 1440, 390, 320].includes(width)) await page.screenshot({ path: `screenshots/desktop-${width}.png`.replace('desktop-3', 'mobile-3'), fullPage: true });
   report.viewports.push(state);
 }
