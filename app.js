@@ -110,73 +110,55 @@ $('#contact-form').addEventListener('submit', async (event) => {
   }
 });
 
-// One continuous route. Every coordinate comes from the actual page geometry.
-// The connection from the hero to the services travels outside the sheet.
-function roundedRoute(points, radius) {
-  const distance = (a, b) => Math.hypot(b.x - a.x, b.y - a.y);
-  let d = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 1; i < points.length - 1; i++) {
-    const a = points[i - 1], b = points[i], c = points[i + 1];
-    const before = distance(a, b), after = distance(b, c);
-    if (before < .1 || after < .1) continue;
-    const r = Math.min(radius, before / 2, after / 2);
-    const p = { x: b.x + (a.x - b.x) * r / before, y: b.y + (a.y - b.y) * r / before };
-    const q = { x: b.x + (c.x - b.x) * r / after, y: b.y + (c.y - b.y) * r / after };
-    d += ` L ${p.x} ${p.y} Q ${b.x} ${b.y} ${q.x} ${q.y}`;
-  }
-  const end = points.at(-1); return `${d} L ${end.x} ${end.y}`;
-}
+// The approved route is rebuilt from the section geometry. Deliberate exits
+// and re-entries are exactly those visible in the approved reference.
 let routeFrame;
 function scheduleRoute() { cancelAnimationFrame(routeFrame); routeFrame = requestAnimationFrame(drawRoute); }
+function matchType() {
+  const width = $('.sheet').getBoundingClientRect().width;
+  const scale = width / 941;
+  $$('[data-width]').forEach((span) => {
+    const target = Number(span.dataset.width) * (width >= 768 ? scale : (span.closest('h1') ? (width < 360 ? .91 : 1) : 1));
+    span.style.transform = `scaleX(${target / span.offsetWidth})`;
+  });
+}
 function drawRoute() {
-  const sheet = $('.sheet'), base = sheet.getBoundingClientRect(), width = base.width;
-  const rect = (element) => {
-    const r = (typeof element === 'string' ? $(element) : element).getBoundingClientRect();
+  const sheet = $('.sheet'), base = sheet.getBoundingClientRect(), width = base.width, scale = width / 941;
+  const box = (selector) => {
+    const r = $(selector).getBoundingClientRect();
     return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height, right: r.right - base.left, bottom: r.bottom - base.top };
   };
-  const point = (x, y) => ({ x, y });
-  const anchors = (selector) => $$(selector).map((el) => { const r = rect(el); return point(r.x, r.y); });
   const svg = $('.route'); svg.setAttribute('viewBox', `0 0 ${width} ${base.height}`);
-  const cta = rect('#hero-cta'), hero = rect('.hero-area'), services = rect('#services'), process = rect('#process'), benefits = rect('#benefits'), faq = rect('#faq'), contact = rect('#contact');
-  let points, nodes;
-  if (width < 768) {
-    const gutter = width < 360 ? 12 : 16;
-    const serviceNodes = anchors('.service .route-anchor');
-    const stepNodes = anchors('.steps .route-anchor');
-    const benefitNodes = anchors('.benefit .route-anchor');
-    points = [point(cta.right, cta.y + cta.h / 2), point(width - 18, cta.y + cta.h / 2), point(width - 18, hero.bottom - 30), point(gutter, hero.bottom - 30), point(gutter, contact.bottom - 25), point(width * .85, contact.bottom - 25)];
-    nodes = [...serviceNodes, ...stepNodes, ...benefitNodes].map((p) => point(gutter, p.y));
+  const h = box('.hero-area'), s = box('#services'), p = box('#process'), b = box('#benefits'), f = box('#faq'), c = box('#contact');
+  const cta = box('#hero-cta');
+  let path, contactPath = '', nodes = [];
+  if (width >= 768) {
+    const x = (v) => (v * scale).toFixed(2);
+    const y = (section, v) => (section.y + v * scale).toFixed(2);
+    const cy = cta.y + cta.h / 2;
+    path = `M ${cta.right} ${cy} H ${x(435)} Q ${x(460)} ${cy} ${x(477)} ${cy - 24 * scale} L ${x(704)} ${y(h,78)} V 0`;
+    path += ` M ${x(314)} ${y(s,31)} H ${x(407)} Q ${x(448)} ${y(s,31)} ${x(448)} ${y(s,72)} V ${y(s,179)} Q ${x(448)} ${y(s,224)} ${x(493)} ${y(s,224)} H ${x(646)} Q ${x(690)} ${y(s,224)} ${x(690)} ${y(s,180)} V ${y(s,74)} Q ${x(690)} ${y(s,31)} ${x(733)} ${y(s,31)} H ${x(853)} Q ${x(894)} ${y(s,31)} ${x(894)} ${y(s,72)} V ${y(p,30)} Q ${x(894)} ${y(p,73)} ${x(851)} ${y(p,73)} H ${x(357)}`;
+    path += ` M 0 ${y(b,186)} H ${x(262)} Q ${x(297)} ${y(b,186)} ${x(297)} ${y(b,151)} V ${y(b,65)} Q ${x(297)} ${y(b,26)} ${x(336)} ${y(b,26)} H ${x(825)} Q ${x(864)} ${y(b,26)} ${x(864)} ${y(b,65)} V ${y(b,99)}`;
+    const faqBottom = f.h / scale - 25;
+    path += ` M 0 ${y(f,faqBottom)} H ${x(383)} Q ${x(422)} ${y(f,faqBottom)} ${x(422)} ${y(f,faqBottom-39)} V ${y(f,126)} Q ${x(422)} ${y(f,86)} ${x(382)} ${y(f,86)} H ${x(315)}`;
+    contactPath = `M ${x(707)} ${y(c,140)} L ${x(796)} ${y(c,135)} Q ${x(800)} ${y(c,140)} ${x(793)} ${y(c,157)} L ${x(778)} ${y(c,188)} Q ${x(770)} ${y(c,200)} ${x(790)} ${y(c,201)} L ${x(871)} ${y(c,208)} Q ${x(896)} ${y(c,212)} ${x(918)} ${c.bottom}`;
+    nodes = [[314,y(s,31)],[523,y(s,31)],[741,y(s,31)],[357,y(p,73)],[460,y(p,73)],[571,y(p,73)],[690,y(p,73)],[826,y(p,73)],[335,y(b,26)],[517,y(b,26)],[718,y(b,26)]].map(([cx,cy]) => ({ x: cx * scale, y:Number(cy) }));
   } else {
-    const s = anchors('.service .route-anchor'), steps = anchors('.steps .route-anchor'), b = anchors('.benefit .route-anchor');
-    const photos = $$('.service img').map(rect), gap1 = (photos[0].right + photos[1].x) / 2, gap2 = (photos[1].right + photos[2].x) / 2;
-    const serviceLow = photos[0].bottom - width * .015, outside = width + 25;
-    const right = width * .951, leftGap = rect('.benefits-grid').x - width * .018;
-    const processGap = width * .36;
-    const faqLane = rect('.faq-list').x - width * .045;
-    points = [point(cta.right - 1, cta.y + cta.h / 2),point(width * .47, cta.y + cta.h / 2), point(width * .83, hero.h * .10),point(width * .83, -20),point(outside,-20),point(outside,services.y + 7),point(s[0].x,services.y + 7),s[0],point(gap1,s[0].y),point(gap1,serviceLow),point(gap2,serviceLow),point(gap2,s[2].y),s[2],point(right,s[2].y),point(right,steps[0].y),...steps.toReversed(),point(processGap,steps[0].y),point(processGap,benefits.y - 14),point(-20,benefits.y - 14),point(-20,benefits.bottom - width * .052),point(leftGap,benefits.bottom - width * .052),point(leftGap,b[0].y),b[0]];
-    // Two-row benefit grids follow the same modules without crossing their text.
-    const rows = [];
-    b.forEach((p) => { let row = rows.find((r) => Math.abs(r[0].y - p.y) < 3); if (!row) { row = []; rows.push(row); } row.push(p); });
-    rows.forEach((row, i) => {
-      if (i) points.push(point(leftGap,row[0].y),row[0]);
-      points.push(...row.slice(i ? 0 : 1),point(right,row[0].y));
-      if (i < rows.length - 1) {
-        const bottom = rect($$('.benefit')[i * 2 + 1]).bottom + width * .012;
-        points.push(point(right,bottom),point(leftGap,bottom));
-      }
-    });
-    // FAQ loop stays entirely to the left of the questions.
-    points.push(point(right,benefits.bottom - 8),point(outside,benefits.bottom - 8),point(outside,base.height + 20),point(-20,base.height + 20),point(-20,faq.bottom - 25),point(faqLane,faq.bottom - 25),point(faqLane,faq.y + faq.h * .51),point(width * .334,faq.y + faq.h * .51),point(faqLane,faq.y + faq.h * .51),point(faqLane,faq.bottom - 25),point(-20,faq.bottom - 25),point(-20,contact.bottom - 17),point(width * .83,contact.bottom - 17),point(width * .86,contact.y + contact.h * .64),point(width * .77,contact.y + contact.h * .64));
-    nodes = [...s,...steps,...b];
+    const gutter = width < 360 ? 12 : 15;
+    const bend = width - 16;
+    const middle = cta.y + cta.h / 2;
+    path = `M ${cta.right} ${middle} H ${bend-20} Q ${bend} ${middle} ${bend} ${middle+20} V ${h.bottom-40} Q ${bend} ${h.bottom-20} ${bend-20} ${h.bottom-20} H ${gutter+20} Q ${gutter} ${h.bottom-20} ${gutter} ${h.bottom} V ${c.bottom-35} Q ${gutter} ${c.bottom-15} ${gutter+20} ${c.bottom-15} H ${width-35}`;
+    nodes = $$('.service .route-anchor,.steps .route-anchor,.benefit .route-anchor').map((el) => ({x:gutter,y:el.getBoundingClientRect().top-base.top}));
   }
-  $('#route-path').setAttribute('d', roundedRoute(points, width < 768 ? 23 : width * .045));
-  $('#route-nodes').replaceChildren(...nodes.map((p) => {
+  $('#route-path').setAttribute('d',path);
+  $('#contact-route').setAttribute('d',contactPath);
+  $('#route-nodes').replaceChildren(...nodes.map(({x,y}) => {
     const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    circle.setAttribute('cx',p.x); circle.setAttribute('cy',p.y); circle.setAttribute('r',width < 768 ? 3.5 : Math.max(4,width*.0045)); return circle;
+    circle.setAttribute('cx',x); circle.setAttribute('cy',y); circle.setAttribute('r',width >= 768 ? 4.5*scale : 3); return circle;
   }));
 }
-new ResizeObserver(scheduleRoute).observe($('.sheet'));
-window.addEventListener('resize', () => { if (innerWidth >= 768) closeMenu(); scheduleRoute(); });
-document.fonts.ready.then(scheduleRoute);
-window.addEventListener('load', scheduleRoute);
+new ResizeObserver(() => { matchType(); scheduleRoute(); }).observe($('.sheet'));
+window.addEventListener('resize', () => { if (innerWidth >= 768) closeMenu(); matchType(); scheduleRoute(); });
+document.fonts.ready.then(() => { matchType(); scheduleRoute(); });
+window.addEventListener('load', () => { matchType(); scheduleRoute(); });
 scheduleRoute();

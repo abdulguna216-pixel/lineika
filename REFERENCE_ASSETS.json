@@ -1,0 +1,51 @@
+{
+  "tool": "Built-in image_gen",
+  "source": "User supplied approved reference",
+  "assets": [
+    {
+      "name": "hero-ref",
+      "prompt": "Precise cleanup and extraction of the TOP photograph only, the region x=0..941 y=0..452 of the supplied 941x1672 reference. Output a single clean wide 941:452 photograph (about 2.08:1 aspect ratio). Preserve EXACTLY this photo composition, original warehouse conveyor, the SAME rear-view worker with black cap and RED reflective vest around x550 y160, grey taped boxes, long leftward shadow, warm nearly white concrete floor, all sizes, positions and lighting. The left 45% must become completely empty seamless warm ivory concrete/paper field at the same luminance as original background #ebe7dd. Erase ALL overlaid typography, logo, menu, CTA buttons, tiny labels, grid lines and the thin red drawn route. Keep red ONLY on worker vest. Do not move the conveyor, reverse the worker to face camera, add boxes or invent a different warehouse. We will rebuild text/buttons/route as live HTML and SVG. Do not include anything below the top hero; output ONLY clean hero photographic backdrop, absolutely NO text or graphics."
+    },
+    {
+      "name": "warehouse-ref",
+      "prompt": "Extract and faithfully restore ONLY the small black and white warehouse photograph located at x308..441 y602..693 of supplied reference. Output a standalone 3:2 photograph of EXACTLY that simple side-view full-body man in BLACK clothes and BLACK cap pulling a manual pallet jack with GREY cardboard boxes stacked on its right. Plain light grey warehouse wall/floor, long side view, no red vest, no tall shelving, no other people. Preserve photograph composition and framing from reference, do not invent new scene. No UI, text, route or borders."
+    },
+    {
+      "name": "production-ref",
+      "prompt": "Extract and faithfully restore ONLY the small black and white production photograph located at x515..684 y602..694 of supplied reference. Output a standalone wide 1.8:1 image showing EXACTLY the man in BLACK cap and BLACK short sleeve shirt in right half facing left at a waist-level production conveyor/workbench. Industrial shelving to left, bright vertical windows behind. Crop as original. Erase the overlaid thin red graphic line near the bottom. Preserve all original scene composition. No red clothing, no added person, no UI or text."
+    },
+    {
+      "name": "logistics-ref",
+      "prompt": "Extract and faithfully restore ONLY the logistics photograph located at x736..941 y577..694 in supplied reference. Output a standalone wide 1.8:1 image of EXACTLY the black and white loading yard: tall dark shipping containers to left, side of big articulated grey truck at right, a distant FULL BODY worker in a RED safety vest in middle seen from behind walking away. Very light near-white empty sky/light wall across top. Retain original composition. Remove all thin red route graphics and no text or UI."
+    },
+    {
+      "name": "staff-ref",
+      "prompt": "Extract and faithfully restore ONLY the warehouse staff photograph located at x330..484 y1085..1148 in supplied reference. Output a standalone wide 2.4:1 photograph of EXACTLY original rear-view worker in RED reflective vest in right half, industrial warehouse shelves all around, black cap dark trousers, almost monochrome except red vest. Keep original framing, no helmets, no people facing camera. No UI or text."
+    },
+    {
+      "name": "documents-ref",
+      "prompt": "Extract and faithfully restore ONLY the paperwork photograph located at x513..685 y1085..1148 in supplied reference. Output a standalone wide 2.7:1 close up photograph exactly matching that photo: black and white hand holding a black pen on white paper clipped to clipboard, dark suit/work sleeve, clipboard occupies center and right, soft shadows, no face or red objects. Preserve scene framing and hand position. No UI, no text or marks from website."
+    },
+    {
+      "name": "coordinator-ref",
+      "prompt": "Extract and faithfully restore ONLY the coordinator photograph located at x712..941 y1026..1148 in supplied reference. Output wide 1.9:1 photograph showing EXACTLY the reference coordinator rear/profile, black baseball cap, RED safety vest over black work jacket, black radio in hand, man fills right side with head at upper right. Warehouse wall/window with diagonal perspective at left. Selective monochrome except vest. Retain original composition and pose, don't put shelves everywhere. Erase thin red drawn route. No UI or text."
+    },
+    {
+      "name": "contact-ref",
+      "prompt": "Extract and faithfully restore ONLY the bottom right architectural warehouse photograph located at x674..941 y1365..1585 in supplied reference. Output 1.22:1 photograph exactly matching that scene: right side of a tall dark corrugated metal warehouse facade extends from top right into far distance at left; bright ivory concrete path, ONE SMALL full body worker wearing RED vest walking AWAY toward distance at x855 y1510 relative to full reference. Camera far from worker, huge empty pale path, simple warehouse, NO truck loading docks, no glass office windows. Remove thin red drawn route, all UI/text. Preserve original calm grey exposure, architecture, perspective and the scale of the distant worker."
+    }
+  ],
+  "followup_edits": [
+    {
+      "output": "hero-matched.webp",
+      "tool": "Built-in image_gen",
+      "prompt": "Use case: precise-object-edit. IMAGE 1 is the clean hero asset to EDIT; IMAGE 2 is the exact website reference whose top photo layout is authoritative. Keep the wide 2.08:1 canvas and pale ivory concrete field. Make this small geometry correction to IMAGE 1 so that mapped to a 941x452 canvas, the rear-facing worker's head is centered at (548,102), his feet reach y218, his height is approximately 128 pixels. Currently he is too big, too low and too far right. Also move the entire conveyor about 58 pixels LEFT on that 941x452 coordinate system. Its left edge must pass through around (455,452), (555,300), (660,150), (760,0). Do not change photo style, boxes, red vest, camera angle or lighting. Match image 2's photograph as closely as possible but REMOVE ALL text, logo, buttons, tiny labels, grid and red graphic route. Never draw a red line. All floor and boxes remain warm greyscale; only safety vest red. Output only the clean photograph, same wide 2.08:1 ratio."
+    },
+    {
+      "output": "coordinator-cutout.webp",
+      "tool": "Built-in image_gen",
+      "transparent_background": true,
+      "prompt": "Use case: background-extraction. Extract the exact man with black cap, red safety vest, dark jacket and his hand-held radio from the input photograph. Keep the full source canvas dimensions/aspect ratio and the man's exact position, scale, details and colors unchanged. Make ALL the warehouse wall, sky, windows and background fully transparent. Preserve the person and radio precisely, do not crop or recenter the person, do not add a shadow or background. This is a clean transparent photographic foreground cutout to overlay on the SAME original photo."
+    }
+  ]
+}

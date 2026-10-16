@@ -16,13 +16,13 @@
 <body>
 <a class="skip-link" href="#main">Перейти к содержимому</a>
 <div class="sheet">
-  <svg class="route" aria-hidden="true"><path id="route-path" fill="none"/><g id="route-nodes"></g></svg>
+  <svg class="route" aria-hidden="true"><defs><linearGradient id="route-fade"><stop offset="0%" stop-color="#ff241b"/><stop offset="80%" stop-color="#ff241b"/><stop offset="100%" stop-color="#ff241b" stop-opacity=".25"/></linearGradient></defs><path id="route-path" fill="none"/><path id="contact-route" fill="none"/><g id="route-nodes"></g></svg>
   <main id="main">
   <div class="hero-area">
-    <img class="hero-photo" src="/images/hero.webp" alt="Работник в красном жилете рядом с диагональным конвейером с коробками" fetchpriority="high" width="1536" height="1024">
+    <img class="hero-photo" src="/images/hero-matched.webp" alt="Работник в красном жилете рядом с диагональным конвейером с коробками" fetchpriority="high" width="1536" height="1024">
     <header class="header" role="banner">
       <span class="edge-number">01</span>
-      <a class="brand" href="#" aria-label="ЛИНЕЙКА — на главную"><span>ЛИНЕЙКА<i>.</i></span><small>АУТСОРСИНГ ПЕРСОНАЛА</small></a>
+      <a class="brand" href="#" aria-label="ЛИНЕЙКА — на главную"><span>ЛИНЕЙКА<i>.</i></span><img class="brand-mark" src="/brand.svg" alt="" width="146" height="25"><small>АУТСОРСИНГ ПЕРСОНАЛА</small></a>
       <nav aria-label="Основная навигация"><a href="#services">Услуги</a><a href="#process">Как работаем</a><a href="#contact">Контакты</a></nav>
       <a class="button header-cta" href="#contact">Отправить заявку <span>↗</span></a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Открыть меню"><span></span><span></span></button>
@@ -30,7 +30,7 @@
     </header>
       <section class="hero" aria-labelledby="hero-title">
         <div class="hero-copy">
-          <h1 id="hero-title"><span>ЛЮДИ</span><span>ДВИГАЮТ</span><span>ПРОЦЕСС<span class="red">.</span></span></h1>
+          <h1 id="hero-title"><span data-width="157">ЛЮДИ</span><span data-width="254">ДВИГАЮТ</span><span data-width="255">ПРОЦЕСС</span><i class="red" aria-hidden="true"></i></h1>
           <p>Линейный персонал для складов<br>и производств по всей России.</p>
           <a id="hero-cta" class="button" href="#contact">Обсудить задачу <span>↗</span></a>
         </div>
@@ -39,15 +39,15 @@
       </section>
   </div>
   <section class="section services" id="services" aria-labelledby="services-title">
-    <div class="section-intro"><div class="eyebrow"><span>02</span>УСЛУГИ</div><h2 id="services-title">ТАМ, ГДЕ<br>НУЖНЫ ЛЮДИ<span class="red">.</span></h2></div>
+    <div class="section-intro"><div class="eyebrow"><span>02</span>УСЛУГИ</div><h2 id="services-title"><span data-width="118">ТАМ, ГДЕ</span><span data-width="198">НУЖНЫ ЛЮДИ.</span></h2></div>
     <div class="services-grid">
-      <article class="service"><span class="route-anchor"></span><span class="item-number">01</span><h3>Склады</h3><p>Комплектуем персонал<br>для складских комплексов.</p><img src="/images/warehouse.webp" alt="Сотрудник перемещает паллету с коробками" loading="lazy" width="768" height="512"></article>
-      <article class="service"><span class="route-anchor"></span><span class="item-number">02</span><h3>Производство</h3><p>Предоставляем рабочих<br>на производственные площадки.</p><img src="/images/production.webp" alt="Рабочий за оборудованием на производственной линии" loading="lazy" width="768" height="512"></article>
-      <article class="service"><span class="route-anchor"></span><span class="item-number">03</span><h3>Логистика</h3><p>Обеспечиваем персонал<br>для логистических процессов.</p><img src="/images/logistics.webp" alt="Работник на погрузочной площадке рядом с грузовиком" loading="lazy" width="768" height="512"></article>
+      <article class="service"><span class="route-anchor"></span><span class="item-number">01</span><h3>Склады</h3><p>Комплектуем персонал<br>для складских комплексов.</p><img src="/images/warehouse-ref.webp" alt="Сотрудник перемещает паллету с коробками" loading="lazy" width="768" height="512"></article>
+      <article class="service"><span class="route-anchor"></span><span class="item-number">02</span><h3>Производство</h3><p>Предоставляем рабочих<br>на производственные<br>площадки.</p><img src="/images/production-ref.webp" alt="Рабочий за оборудованием на производственной линии" loading="lazy" width="768" height="512"></article>
+      <article class="service"><span class="route-anchor"></span><span class="item-number">03</span><h3>Логистика</h3><p>Обеспечиваем персонал<br>для логистических<br>процессов.</p><img src="/images/logistics-ref.webp" alt="Работник на погрузочной площадке рядом с грузовиком" loading="lazy" width="768" height="512"></article>
     </div>
   </section>
   <section class="section process" id="process" aria-labelledby="process-title">
-    <div class="section-intro"><div class="eyebrow"><span>03</span>КАК РАБОТАЕМ</div><h2 id="process-title">От потребности<br>до рабочей смены<span>.</span></h2><p>Простой и понятный процесс,<br>чтобы вы получили людей вовремя.</p></div>
+    <div class="section-intro"><div class="eyebrow"><span>03</span>КАК РАБОТАЕМ</div><h2 id="process-title"><span data-width="200">От потребности</span><span data-width="244">до рабочей смены.</span></h2><p>Простой и понятный процесс,<br>чтобы вы получили людей вовремя.</p></div>
     <ol class="steps">
       <li><span class="route-anchor"></span><span class="item-number">01</span><h3>Заявка</h3><p>Обсуждаем задачу<br>и потребности.</p></li>
       <li><span class="route-anchor"></span><span class="item-number">02</span><h3>Подбор</h3><p>Формируем команду<br>под ваши требования.</p></li>
@@ -57,33 +57,33 @@
     </ol>
   </section>
   <section class="section benefits" id="benefits" aria-labelledby="benefits-title">
-    <div class="section-intro"><div class="eyebrow"><span>04</span>ПОЧЕМУ МЫ</div><h2 id="benefits-title">СМЕНА<br>РАБОТАЕТ<span class="red">.</span></h2></div>
+    <div class="section-intro"><div class="eyebrow"><span>04</span>ПОЧЕМУ МЫ</div><h2 id="benefits-title"><span data-width="93">СМЕНА</span><span data-width="131">РАБОТАЕТ</span><i class="red" aria-hidden="true"></i></h2></div>
     <div class="benefits-grid">
-      <article class="benefit"><span class="route-anchor"></span><span class="item-number">01</span><h3>Подбираем<br>людей</h3><p>Находим сотрудников<br>под ваши задачи и график.</p><img src="/images/staff.webp" alt="Сотрудник в красном жилете в складском проходе" loading="lazy" width="768" height="512"></article>
-      <article class="benefit"><span class="route-anchor"></span><span class="item-number">02</span><h3>Оформляем<br>и выводим</h3><p>Берём на себя<br>кадровые вопросы.</p><img src="/images/documents.webp" alt="Рука заполняет документы на планшете" loading="lazy" width="768" height="512"></article>
-      <article class="benefit"><span class="route-anchor"></span><span class="item-number">03</span><h3>Контролируем<br>работу</h3><p>Остаёмся на связи<br>и решаем вопросы в процессе.</p><img src="/images/coordinator.webp" alt="Координатор на объекте с рацией" loading="lazy" width="768" height="512"></article>
-      <article class="benefit"><span class="route-anchor"></span><span class="item-number">04</span><h3>Персональный<br>менеджер на объекте</h3><p>Выделяем менеджера, который координирует работу на месте.</p><img src="/images/manager.webp" alt="Руки менеджера за ноутбуком" loading="lazy" width="768" height="512"></article>
+      <article class="benefit"><span class="route-anchor"></span><span class="item-number">01</span><h3>Подбираем<br>людей</h3><p>Находим сотрудников<br>под ваши задачи<br>и график.</p><img src="/images/staff-ref.webp" alt="Сотрудник в красном жилете в складском проходе" loading="lazy" width="768" height="512"></article>
+      <article class="benefit"><span class="route-anchor"></span><span class="item-number">02</span><h3>Оформляем<br>и выводим</h3><p>Берём на себя<br>кадровые вопросы.</p><img src="/images/documents-ref.webp" alt="Рука заполняет документы на планшете" loading="lazy" width="768" height="512"></article>
+      <article class="benefit"><span class="route-anchor"></span><span class="item-number">03</span><h3>Контролируем<br>работу</h3><p>Остаемся на связи<br>и решаем вопросы<br>в процессе.</p><img class="coordinator-background" src="/images/coordinator-ref.webp" alt="" loading="lazy" width="768" height="512"><img class="coordinator-person" src="/images/coordinator-cutout.webp" alt="Координатор на объекте с рацией" loading="lazy" width="768" height="512"></article>
+
     </div>
   </section>
   <section class="section faq" id="faq" aria-labelledby="faq-title">
-    <div class="section-intro"><div class="eyebrow"><span>05</span>ВОПРОСЫ</div><h2 id="faq-title">Вопросы<span class="red">.</span></h2></div>
+    <div class="section-intro"><div class="eyebrow"><span>05</span>ВОПРОСЫ</div><h2 id="faq-title"><span data-width="194">Вопросы</span><i class="red" aria-hidden="true"></i></h2></div>
     <div class="faq-list" id="faq-list"></div>
   </section>
   <section class="section contact" id="contact" aria-labelledby="contact-title">
-    <div class="section-intro"><div class="eyebrow"><span>06</span>ОБСУДИМ</div><h2 id="contact-title">Обсудим<br>вашу задачу<span class="red">.</span></h2><p>Оставьте контакты, и мы свяжемся с вами<br>для уточнения деталей.</p></div>
+    <div class="section-intro"><div class="eyebrow"><span>06</span>ОБСУДИМ</div><h2 id="contact-title"><span data-width="155">Обсудим</span><span data-width="218">вашу задачу</span><i class="red" aria-hidden="true"></i></h2><p>Оставьте контакты, и мы свяжемся с вами<br>для уточнения деталей.</p></div>
     <form id="contact-form" novalidate>
       <div class="field"><label class="sr-only" for="name">Ваше имя</label><input id="name" name="name" placeholder="Ваше имя" autocomplete="name" required minlength="2" maxlength="80" aria-describedby="name-error"><span class="field-error" id="name-error"></span></div>
       <div class="field"><label class="sr-only" for="phone">Номер телефона</label><input id="phone" name="phone" type="tel" placeholder="Номер телефона" autocomplete="tel" required maxlength="24" aria-describedby="phone-error"><span class="field-error" id="phone-error"></span></div>
       <div class="field select-field"><label class="sr-only" for="service">Какая услуга нужна?</label><select id="service" name="service"><option value="">Какая услуга нужна?</option><option>Склады</option><option>Производство</option><option>Логистика</option><option>Другое</option></select></div>
       <button class="button submit-button" type="submit">Отправить заявку <span>↗</span></button>
       <label class="consent" id="consent-label" hidden><input type="checkbox" id="consent" name="consent"><span>Согласен на обработку персональных данных в соответствии с <a id="privacy-link" href="">политикой конфиденциальности</a>.</span></label>
-      <p class="demo-notice" id="demo-notice">Деморежим: данные не отправляются.</p>
+      <p class="demo-notice" id="demo-notice">Демонстрационная форма: данные не отправляются.</p>
       <p id="form-status" role="status" aria-live="polite"></p>
     </form>
-    <img class="contact-photo" src="/images/contact.webp" alt="Современный складской корпус и работник в красном жилете" loading="lazy" width="768" height="512">
+    <img class="contact-photo" src="/images/contact-ref.webp" alt="Современный складской корпус и работник в красном жилете" loading="lazy" width="768" height="512">
   </section>
   </main>
-  <footer class="footer"><a class="brand" href="#" aria-label="ЛИНЕЙКА — на главную"><span>ЛИНЕЙКА<i>.</i></span><small>АУТСОРСИНГ ПЕРСОНАЛА</small></a><nav aria-label="Навигация в подвале"><a href="#services">Услуги</a><a href="#process">Как работаем</a><a href="#contact">Контакты</a></nav><p>ЛИНЕЙНЫЙ ПЕРСОНАЛ<br>ДЛЯ СКЛАДОВ И ПРОИЗВОДСТВ</p></footer>
+  <footer class="footer"><a class="brand" href="#" aria-label="ЛИНЕЙКА — на главную"><span>ЛИНЕЙКА<i>.</i></span><img class="brand-mark" src="/brand.svg" alt="" width="146" height="25"><small>АУТСОРСИНГ ПЕРСОНАЛА</small></a><nav aria-label="Навигация в подвале"><a href="#services">Услуги</a><a href="#process">Как работаем</a><a href="#contact">Контакты</a></nav><p>ЛИНЕЙНЫЙ ПЕРСОНАЛ<br>ДЛЯ СКЛАДОВ И ПРОИЗВОДСТВ<br>ПО ВСЕЙ РОССИИ.</p></footer>
 </div>
 </body>
 </html>
