@@ -1,0 +1,41 @@
+{
+  "tool": "Built-in image_gen",
+  "assets": [
+    {
+      "name": "hero",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Landscape 3:2 photograph. Very high overhead oblique view of a warehouse floor. A long black roller conveyor with spaced plain cardboard boxes runs dramatically diagonally from lower left foreground to upper right distance. One full-body male worker in a RED reflective vest, black trousers walks on the empty light grey concrete floor just LEFT of the conveyor with long shadow falling lower left. Far left third is mostly empty light grey floor. Conveyor occupies right half. Architectural calm, reference composition, no shelving."
+    },
+    {
+      "name": "warehouse",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Wide 3:2. Full body warehouse worker dressed in dark work clothes pulling a manual pallet jack loaded with neatly stacked cardboard boxes. Side view, warehouse background, industrial documentary photograph, monochrome."
+    },
+    {
+      "name": "production",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Wide 3:2. Worker in black cap and dark short sleeved work shirt viewed in profile operating an assembly workbench conveyor inside factory. Clearly visible hands doing an operation, medium distance, shelves and windows in background. Monochrome."
+    },
+    {
+      "name": "logistics",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Wide 3:2. Spacious truck loading yard, shipping containers at left and long articulated truck at right, distant full body worker in red safety vest at center walking away. Industrial exterior, strong daylight, real architectural photograph."
+    },
+    {
+      "name": "staff",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Wide 3:2. Rear view of worker wearing RED reflective safety vest standing inside tall warehouse shelving aisle. Person at medium distance from waist up, industrial shelving on both sides. Grey desaturated image except red vest."
+    },
+    {
+      "name": "documents",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Wide 3:2. Documentary close up of a real person's hand holding a pen filling out plain paperwork clipped to a clipboard, dark work jacket sleeve, warehouse setting. Only hands and clipboard visible, no face, no legible words, monochrome."
+    },
+    {
+      "name": "coordinator",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Wide 3:2. Documentary medium close profile rear view of warehouse coordinator in black cap and RED reflective safety vest speaking into a black handheld two-way radio, warehouse aisle background, no posing."
+    },
+    {
+      "name": "manager",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Wide 3:2. Documentary close up of only the hands of a site manager typing on a laptop at a simple industrial desk. Dark work jacket sleeves, natural warehouse office daylight. No face, no legible words, monochrome photograph."
+    },
+    {
+      "name": "contact",
+      "prompt": "Use case: photorealistic-natural. Asset type: documentary industrial photograph for the Russian LINEYKA staffing website. Restrained architectural editorial photography, nearly monochrome warm grey concrete and black machinery; only worker safety vests retain vivid pure red. Natural directional light, real materials, believable human anatomy and equipment. No text, logos, UI, graphic red lines, borders, watermarks or collage. Wide 3:2. Architectural exterior photograph of a long modern dark grey metal clad industrial warehouse building receding diagonally to the far left. Tall facade fills upper right. Pale concrete walkway, single distant full-body worker in a RED safety vest walking away in the right third. Soft natural light, calm empty scene, desaturated except red vest."
+    }
+  ]
+}
