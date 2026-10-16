@@ -68,6 +68,27 @@ report.interactions.push('Form validates name and phone, focuses errors, display
 await page.emulateMedia({ reducedMotion: 'reduce' });
 assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior), 'auto');
 report.interactions.push('Reduced motion disables smooth scrolling.');
+assert.equal(await page.locator('.edge-number,.eyebrow>span,.item-number').count(), 0);
+const savedName = await page.locator('#name').inputValue();
+const savedPhone = await page.locator('#phone').inputValue();
+for (const [index, serviceName] of ['Склады', 'Производство', 'Логистика'].entries()) {
+  const choice = page.getByRole('button', { name: serviceName, exact: true });
+  if (index === 0) { await choice.focus(); await page.keyboard.press('Enter'); }
+  else if (index === 1) { await choice.focus(); await page.keyboard.press('Space'); }
+  else await choice.click();
+  assert.equal(await page.locator('#service').inputValue(), serviceName);
+  assert.equal(await page.locator('#name').inputValue(), savedName);
+  assert.equal(await page.locator('#phone').inputValue(), savedPhone);
+  assert.match(await page.locator('#service-selection-status').textContent(), new RegExp(serviceName));
+  assert.equal(await page.locator('#service').evaluate((el) => el === document.activeElement), true);
+}
+await page.locator('#contact-form').evaluate((form) => form.reset());
+await page.getByRole('button', { name: 'Склады', exact: true }).click();
+assert.equal(await page.locator('#name').evaluate((el) => el === document.activeElement), true);
+assert.equal(await page.locator('#service').inputValue(), 'Склады');
+assert.equal(await page.locator('#form-status').textContent(), '');
+assert.equal(outbound.length, 0);
+report.interactions.push('No visible numbering. All three service buttons select the matching form option with pointer/Enter/Space, preserve contacts, focus the next field and never submit the form.');
 // Exercise the opt-in integration using an intercepted endpoint only.
 // No actual service receives the test values.
 const live = await browser.newPage({ viewport: { width: 1440, height: 1000 } });

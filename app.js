@@ -54,6 +54,22 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') { closeMenu(); menu.focus(); }
 });
 
+$$('.service-select').forEach((button) => {
+  button.addEventListener('click', () => {
+    const service = $('#service');
+    service.value = button.dataset.service;
+    service.dispatchEvent(new Event('change', { bubbles: true }));
+    $('#form-status').textContent = '';
+    $('#service-selection-status').textContent = `Выбрана услуга: ${service.value}. Заполните контактные данные.`;
+    const nextField = !$('#name').value.trim() ? $('#name') : !$('#phone').value.trim() ? $('#phone') : service;
+    nextField.focus({ preventScroll: true });
+    $('#contact').scrollIntoView({
+      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      block: 'start'
+    });
+  });
+});
+
 const isLive = !config.demoMode && /^https:\/\//.test(config.formEndpoint) && /^https:\/\//.test(config.privacyUrl);
 if (isLive) {
   $('#demo-notice').hidden = true; $('#consent-label').hidden = false;

@@ -2005,3 +2005,9 @@ select {
   }
 
 }
+/* Service selection leads directly to the request form. */
+.service-select{display:inline-flex;align-items:center;justify-content:center;gap:calc(8 * var(--u));min-height:calc(36 * var(--u));padding:calc(4 * var(--u)) calc(12 * var(--u));border:1px solid var(--red);border-radius:calc(3 * var(--u));background:var(--red);color:white;font:inherit;line-height:1.2;white-space:nowrap;transition:background .18s}
+.service-select span{font-family:Inter,Arial,sans-serif;font-size:.7em;line-height:1}
+.service-select:hover{background:#e21d16;border-color:#e21d16}
+@media(min-width:768px){.service h3{top:calc(50 * var(--u));font-size:calc(20 * var(--u))}}
+@media(max-width:767px){.service h3,.service p,.benefit h3,.benefit p,.steps h3,.steps p{grid-column:1 / -1}.service-select{min-height:44px;padding:7px 16px;gap:10px;border-radius:3px;font-size:24px}.steps{padding-left:0}}
