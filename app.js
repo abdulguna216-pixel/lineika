@@ -21,11 +21,9 @@ config.faq.forEach(([question, answer], index) => {
   panel.className = 'faq-answer'; panel.id = `answer-${index}`; panel.hidden = true;
   panel.setAttribute('role', 'region'); panel.setAttribute('aria-labelledby', button.id);
   panel.textContent = answer;
-  if (config.demoMode) {
-    const draft = document.createElement('small');
-    draft.textContent = 'Предварительная информация. Условия требуют согласования.';
-    panel.append(draft);
-  }
+  const draft = document.createElement('small');
+  draft.textContent = 'Предварительная информация. Условия требуют согласования.';
+  panel.append(draft);
   button.addEventListener('click', () => {
     const open = button.getAttribute('aria-expanded') === 'true';
     $$('.faq-question').forEach((other) => {
@@ -54,76 +52,32 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') { closeMenu(); menu.focus(); }
 });
 
+const serviceDialog = $('#service-dialog');
+let serviceTrigger;
+let startedOnBackdrop = false;
+
 $$('.service-select').forEach((button) => {
   button.addEventListener('click', () => {
-    const service = $('#service');
-    service.value = button.dataset.service;
-    service.dispatchEvent(new Event('change', { bubbles: true }));
-    $('#form-status').textContent = '';
-    $('#service-selection-status').textContent = `Выбрана услуга: ${service.value}. Заполните контактные данные.`;
-    const nextField = !$('#name').value.trim() ? $('#name') : !$('#phone').value.trim() ? $('#phone') : service;
-    nextField.focus({ preventScroll: true });
-    $('#contact').scrollIntoView({
-      behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
-      block: 'start'
-    });
+    serviceTrigger = button;
+    $('#service-dialog-title').textContent = button.dataset.service;
+    $('#service-dialog-description').textContent = config.services[button.dataset.service];
+    serviceDialog.showModal();
   });
 });
 
-const isLive = !config.demoMode && /^https:\/\//.test(config.formEndpoint) && /^https:\/\//.test(config.privacyUrl);
-if (isLive) {
-  $('#demo-notice').hidden = true; $('#consent-label').hidden = false;
-  $('#privacy-link').href = config.privacyUrl; $('#consent').required = true;
-} else {
-  // No personal data are persisted, logged or transmitted in this mode.
-  $('#name').autocomplete = 'off'; $('#phone').autocomplete = 'off';
-}
-function validateField(field) {
-  const value = field.value.trim();
-  const digits = value.replace(/\D/g, '');
-  let error = '';
-  if (field.name === 'name' && (value.length < 2 || !/\p{L}/u.test(value))) error = 'Укажите имя: минимум 2 символа.';
-  if (field.name === 'phone' && (!/^[+\d\s()−–-]+$/.test(value) || digits.length < 10 || digits.length > 15)) error = 'Укажите телефон: от 10 до 15 цифр.';
-  field.setAttribute('aria-invalid', String(Boolean(error)));
-  document.getElementById(`${field.name}-error`).textContent = error;
-  return !error;
-}
-for (const field of [$('#name'), $('#phone')]) {
-  field.addEventListener('blur', () => { if (field.value) validateField(field); });
-  field.addEventListener('input', () => { if (field.getAttribute('aria-invalid') === 'true') validateField(field); });
-}
-$('#contact-form').addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const fields = [$('#name'), $('#phone')];
-  const valid = fields.map(validateField).every(Boolean);
-  if (!valid) { fields.find((field) => field.getAttribute('aria-invalid') === 'true').focus(); scheduleRoute(); return; }
-  const status = $('#form-status');
-  if (isLive && !$('#consent').checked) {
-    status.textContent = 'Для отправки необходимо согласие на обработку персональных данных.';
-    $('#consent').focus(); return;
-  }
-  const submit = $('.submit-button');
-  submit.disabled = true; submit.textContent = isLive ? 'Отправляем…' : 'Проверяем…';
-  status.textContent = '';
-  try {
-    if (!isLive) {
-      await new Promise((resolve) => setTimeout(resolve, 650));
-      status.textContent = 'Проверка пройдена. Это деморежим: заявка не отправлена, данные не сохранены.';
-    } else {
-      const response = await fetch(config.formEndpoint, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: $('#name').value.trim(), phone: $('#phone').value.trim(), service: $('#service').value, consent: true }),
-        signal: AbortSignal.timeout(15000)
-      });
-      if (!response.ok) throw new Error('Request failed');
-      status.textContent = 'Заявка отправлена. Спасибо за обращение!';
-      $('#contact-form').reset(); fields.forEach((field) => field.removeAttribute('aria-invalid'));
-    }
-  } catch {
-    status.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз позже.';
-  } finally {
-    submit.disabled = false; submit.innerHTML = 'Отправить заявку <span>↗</span>'; scheduleRoute();
-  }
+$('.service-dialog-close').addEventListener('click', () => serviceDialog.close());
+serviceDialog.addEventListener('pointerdown', (event) => {
+  startedOnBackdrop = event.target === serviceDialog;
+});
+serviceDialog.addEventListener('click', (event) => {
+  if (startedOnBackdrop && event.target === serviceDialog) serviceDialog.close();
+  startedOnBackdrop = false;
+});
+serviceDialog.addEventListener('close', () => {
+  if (serviceDialog.open) return;
+  serviceTrigger?.focus({ preventScroll: true });
+  serviceTrigger = undefined;
+  startedOnBackdrop = false;
 });
 
 // The route follows the current section geometry, including expanded desktop panels.
@@ -146,14 +100,15 @@ function drawRoute() {
     return { x: r.left - base.left, y: r.top - base.top, w: r.width, h: r.height, right: r.right - base.left, bottom: r.bottom - base.top };
   };
   const svg = $('.route'); svg.setAttribute('viewBox', `0 0 ${width} ${base.height}`);
-  const h = box('.hero-area'), s = box('#services'), p = box('#process'), b = box('#benefits'), f = box('#faq'), c = box('#contact');
-  const cta = box('#hero-cta');
-  let path, contactPath = '', nodes = [];
+  const h = box('.hero-area'), b = box('#benefits'), f = box('#faq');
+  const intro = box('.hero-copy > p');
+  const startX = intro.x + 5 * (width >= 768 ? scale : 1);
+  let path, nodes = [];
   if (width >= 768) {
     const x = (v) => (v * scale).toFixed(2);
     const y = (section, v) => (section.y + v * scale).toFixed(2);
-    const cy = cta.y + cta.h / 2;
-    path = `M ${cta.right} ${cy} H ${x(435)} Q ${x(460)} ${cy} ${x(477)} ${cy - 24 * scale} L ${x(704)} ${y(h,78)} V 0`;
+    const cy = intro.bottom + 20 * scale;
+    path = `M ${startX} ${cy} H ${x(435)} Q ${x(460)} ${cy} ${x(477)} ${cy - 24 * scale} L ${x(704)} ${y(h,78)} V 0`;
     const anchors = (selector) => $$(selector).map((el) => { const r = box(el); return { x:r.x, y:r.y }; });
     const services = anchors('.service .route-anchor'), steps = anchors('.steps .route-anchor'), benefits = anchors('.benefit .route-anchor');
     const cards = $$('.service').map(box);
@@ -166,17 +121,15 @@ function drawRoute() {
     path += ` M 0 ${bottom} H ${left-radius} Q ${left} ${bottom} ${left} ${bottom-radius} V ${by+radius} Q ${left} ${by} ${left+radius} ${by} H ${right-radius} Q ${right} ${by} ${right} ${by+radius} V ${b.y+230*scale}`;
     const loopBottom = f.bottom - 42 * scale, loopTop = f.y + f.h * .64;
     path += ` M 0 ${loopBottom} H ${x(382)} Q ${x(422)} ${loopBottom} ${x(422)} ${loopBottom-radius} V ${loopTop+radius} Q ${x(422)} ${loopTop} ${x(382)} ${loopTop} H ${x(315)}`;
-    contactPath = `M ${x(707)} ${c.y+c.h*.62} L ${x(796)} ${c.y+c.h*.60} Q ${x(800)} ${c.y+c.h*.62} ${x(793)} ${c.y+c.h*.70} L ${x(778)} ${c.y+c.h*.87} Q ${x(770)} ${c.y+c.h*.91} ${x(790)} ${c.y+c.h*.92} L ${x(871)} ${c.y+c.h*.96} Q ${x(896)} ${c.y+c.h*.98} ${x(918)} ${c.bottom}`;
     nodes = [...services,...steps,...benefits];
   } else {
     const gutter = width < 360 ? 12 : 15;
     const bend = width - 16;
-    const middle = cta.y + cta.h / 2;
-    path = `M ${cta.right} ${middle} H ${bend-20} Q ${bend} ${middle} ${bend} ${middle+20} V ${h.bottom-40} Q ${bend} ${h.bottom-20} ${bend-20} ${h.bottom-20} H ${gutter+20} Q ${gutter} ${h.bottom-20} ${gutter} ${h.bottom} V ${c.bottom-35} Q ${gutter} ${c.bottom-15} ${gutter+20} ${c.bottom-15} H ${width-35}`;
+    const middle = intro.bottom + 20;
+    path = `M ${startX} ${middle} H ${bend-20} Q ${bend} ${middle} ${bend} ${middle+20} V ${h.bottom-40} Q ${bend} ${h.bottom-20} ${bend-20} ${h.bottom-20} H ${gutter+20} Q ${gutter} ${h.bottom-20} ${gutter} ${h.bottom} V ${f.bottom-35} Q ${gutter} ${f.bottom-15} ${gutter+20} ${f.bottom-15} H ${width-35}`;
     nodes = $$('.service .route-anchor,.steps .route-anchor,.benefit .route-anchor').map((el) => ({x:gutter,y:el.getBoundingClientRect().top-base.top}));
   }
   $('#route-path').setAttribute('d',path);
-  $('#contact-route').setAttribute('d',contactPath);
   $('#route-nodes').replaceChildren(...nodes.map(({x,y}) => {
     const circle = document.createElementNS('http://www.w3.org/2000/svg','circle');
     circle.setAttribute('cx',x); circle.setAttribute('cy',y); circle.setAttribute('r',width >= 768 ? 4.5*scale : 3); return circle;

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { writeFile, mkdir, readFile } from 'node:fs/promises';
+import { writeFile, mkdir } from 'node:fs/promises';
 const { chromium } = await import(process.env.LINEYKA_PLAYWRIGHT_PATH || 'playwright');
 const browser = await chromium.launch({ headless: true });
 const errors = [];
@@ -7,7 +7,7 @@ const page = await browser.newPage();
 page.on('pageerror', (error) => errors.push(error.message));
 page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
 page.on('response', (response) => { if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`); });
-const url = 'http://127.0.0.1:4173';
+const url = process.env.LINEYKA_URL || 'http://127.0.0.1:4173';
 const report = { viewports: [], interactions: [] };
 await mkdir('screenshots', { recursive: true });
 for (const width of [941, 1440, 390, 320, 375, 768, 1024]) {
@@ -50,84 +50,51 @@ assert.equal(await page.locator('#answer-1').isVisible(), true);
 await page.keyboard.press('Space');
 assert.equal(await page.locator('#answer-1').isVisible(), false);
 report.interactions.push('FAQ supports pointer and keyboard, maintains aria-expanded and closes other answers.');
-await page.locator('.submit-button').click();
-assert.equal(await page.locator('[aria-invalid=true]').count(), 2);
-assert.equal(await page.locator('#name').evaluate((el) => el === document.activeElement), true);
-await page.locator('#name').fill('Тест');
-await page.locator('#phone').fill('123');
-await page.locator('.submit-button').click();
-assert.equal(await page.locator('#phone').getAttribute('aria-invalid'), 'true');
-await page.locator('#phone').fill('+7 (900) 000-00-00');
-await page.locator('#service').selectOption({ label: 'Склады' });
-const outbound = [];
-page.on('request', (request) => { if (request.method() === 'POST') outbound.push(request.url()); });
-await page.locator('.submit-button').click();
-assert.equal(await page.locator('.submit-button').isDisabled(), true);
-await page.waitForFunction(() => document.getElementById('form-status').textContent.includes('заявка не отправлена'));
-assert.equal(outbound.length, 0);
-assert.equal(await page.evaluate(() => localStorage.length + sessionStorage.length), 0);
-report.interactions.push('Form validates name and phone, focuses errors, displays loading and explicit demo result; zero POST requests and zero browser storage.');
 await page.emulateMedia({ reducedMotion: 'reduce' });
 assert.equal(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior), 'auto');
-report.interactions.push('Reduced motion disables smooth scrolling.');
-assert.equal(await page.locator('.edge-number,.eyebrow>span,.item-number').count(), 0);
-const savedName = await page.locator('#name').inputValue();
-const savedPhone = await page.locator('#phone').inputValue();
-for (const [index, serviceName] of ['Склады', 'Производство', 'Логистика'].entries()) {
-  const choice = page.getByRole('button', { name: serviceName, exact: true });
-  if (index === 0) { await choice.focus(); await page.keyboard.press('Enter'); }
-  else if (index === 1) { await choice.focus(); await page.keyboard.press('Space'); }
-  else await choice.click();
-  assert.equal(await page.locator('#service').inputValue(), serviceName);
-  assert.equal(await page.locator('#name').inputValue(), savedName);
-  assert.equal(await page.locator('#phone').inputValue(), savedPhone);
-  assert.match(await page.locator('#service-selection-status').textContent(), new RegExp(serviceName));
-  assert.equal(await page.locator('#service').evaluate((el) => el === document.activeElement), true);
+assert.equal(await page.locator('form').count(), 0);
+assert.equal(await page.getByText(/^(Обсудить задачу|Отправить заявку)/).count(), 0);
+
+await page.locator('.menu-toggle').click();
+await page.locator('#mobile-nav a[href="#contact"]').click();
+await page.waitForURL('**/#contact');
+const footer = page.locator('footer#contact');
+assert.match(await footer.locator('address').innerText(), /ИП Тегаев Асланбек Викторович/);
+assert.match(await footer.locator('address').innerText(), /Карла Маркса, 2\/1/);
+assert.equal(await footer.getByRole('link', { name: '8-926-202-75-15' }).getAttribute('href'), 'tel:+79262027515');
+assert.equal(await footer.getByRole('link', { name: 'aslan.tegaev@yandex.ru' }).getAttribute('href'), 'mailto:aslan.tegaev@yandex.ru');
+report.interactions.push('Contacts navigation reaches the footer, with no form or application buttons.');
+
+const dialog = page.locator('#service-dialog');
+const descriptions = [['Склады', /приёмки, комплектации/], ['Производство', /операторов линий/], ['Логистика', /сортировки и подготовки грузов/]];
+for (const width of [320, 1440]) {
+  await page.setViewportSize({ width, height: width === 320 ? 568 : 900 });
+  for (const [index, [name, description]] of descriptions.entries()) {
+    const button = page.getByRole('button', { name, exact: true });
+    if (index === 0) await button.click();
+    else { await button.focus(); await page.keyboard.press(index === 1 ? 'Enter' : 'Space'); }
+
+    await dialog.waitFor({ state: 'visible' });
+    assert.equal(await dialog.evaluate((el) => el.matches(':modal')), true);
+    assert.equal(await dialog.getByRole('heading', { name, exact: true }).count(), 1);
+    assert.match(await dialog.locator('#service-dialog-description').textContent(), description);
+    const box = await dialog.boundingBox();
+    assert.ok(box.x >= 0 && box.x + box.width <= width);
+    assert.ok(box.y >= 0 && box.y + box.height <= page.viewportSize().height);
+    const close = dialog.getByRole('button', { name: 'Закрыть описание услуги' });
+    assert.equal(await close.evaluate((el) => el === document.activeElement), true);
+
+    if (index === 0) {
+      await page.screenshot({ path: `screenshots/service-dialog-${width}.png` });
+      await close.click();
+    } else if (index === 1) await page.keyboard.press('Escape');
+    else await page.mouse.click(4, 4);
+
+    await dialog.waitFor({ state: 'hidden' });
+    await page.waitForFunction((service) => document.activeElement?.dataset.service === service, name);
+  }
 }
-await page.locator('#contact-form').evaluate((form) => form.reset());
-await page.getByRole('button', { name: 'Склады', exact: true }).click();
-assert.equal(await page.locator('#name').evaluate((el) => el === document.activeElement), true);
-assert.equal(await page.locator('#service').inputValue(), 'Склады');
-assert.equal(await page.locator('#form-status').textContent(), '');
-assert.equal(outbound.length, 0);
-report.interactions.push('No visible numbering. All three service buttons select the matching form option with pointer/Enter/Space, preserve contacts, focus the next field and never submit the form.');
-// Exercise the opt-in integration using an intercepted endpoint only.
-// No actual service receives the test values.
-const live = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
-const liveConfig = (await readFile('content.js', 'utf8'))
-  .replace('demoMode: true', 'demoMode: false')
-  .replace("formEndpoint: ''", "formEndpoint: 'https://lineyka.test.invalid/request'")
-  .replace("privacyUrl: ''", "privacyUrl: 'https://lineyka.test.invalid/privacy'");
-await live.route('**/content.js', (route) => route.fulfill({ contentType: 'application/javascript', body: liveConfig }));
-const received = [];
-let failRequest = false;
-await live.route('https://lineyka.test.invalid/request', (route) => {
-  const headers = { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'POST, OPTIONS', 'access-control-allow-headers': 'Content-Type' };
-  if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers });
-  received.push(route.request().postDataJSON());
-  return route.fulfill({ status: failRequest ? 503 : 200, headers, contentType: 'application/json', body: '{}' });
-});
-await live.goto(url);
-assert.equal(await live.locator('#demo-notice').isVisible(), false);
-assert.equal(await live.locator('#consent').isChecked(), false);
-await live.locator('#name').fill('Тест'); await live.locator('#phone').fill('+7 (900) 000-00-00');
-await live.locator('.submit-button').click();
-assert.match(await live.locator('#form-status').textContent(), /необходимо согласие/);
-assert.equal(received.length, 0);
-await live.locator('#consent').check();
-await live.locator('.submit-button').click();
-await live.waitForFunction(() => document.getElementById('form-status').textContent.includes('Заявка отправлена'));
-assert.equal(received.length, 1); assert.equal(received[0].consent, true);
-assert.equal(await live.locator('#name').inputValue(), '');
-assert.equal(await live.locator('#consent').isChecked(), false);
-failRequest = true;
-await live.locator('#name').fill('Тест'); await live.locator('#phone').fill('+7 (900) 000-00-00');
-await live.locator('#consent').check(); await live.locator('.submit-button').click();
-await live.waitForFunction(() => document.getElementById('form-status').textContent.includes('Не удалось отправить'));
-assert.equal(await live.locator('.submit-button').isDisabled(), false);
-assert.equal(await live.locator('#name').inputValue(), 'Тест');
-report.interactions.push('Opt-in HTTPS form: unchecked consent blocks POST; intercepted 200 resets the form; intercepted 503 reports an error and preserves fields. No real external service receives data.');
-await live.close();
+report.interactions.push('All three dialogs open with the matching descriptions and close by button, Escape or backdrop. Focus returns to the service button.');
 assert.deepEqual(errors, []);
 report.errors = errors;
 await writeFile('screenshots/verification.json', JSON.stringify(report, null, 2));
